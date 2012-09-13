@@ -9,6 +9,7 @@ require 'json'
 require "thin"
 require 'rack/server'
 require 'rack/websocket'
+require 'uri'
 
 require "fnordmetric/ext"
 require "fnordmetric/version"
@@ -47,10 +48,8 @@ module FnordMetric
   end
 
   def self.mk_redis
-    host, port = options[:redis_url].gsub("redis://", "").split(":")
-    redis_opts = { :host => host }
-    redis_opts.merge!(:port => port) if port
-    Redis.new(redis_opts)
+    uri = URI.parse(options[:redis_url])
+    Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
   end
 
   def self.default_options(opts = {})
